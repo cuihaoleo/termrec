@@ -17,7 +17,7 @@ while ! mkdir "$LOGBASE/$LOGDIRNAME" ; do
 done
 
 LOGDIR="$LOGBASE/$LOGDIRNAME"
-"$BASEDIR/chattr_helper" "$LOGDIR/"{,env,typescript}
+"$BASEDIR/chattr_helper" appendonly "$LOGDIR/"{env,typescript,}
 
 logger -p auth.notice "$(basename $0)($$): record session to $LOGDIR"
 
@@ -30,7 +30,7 @@ echo "Session start at $(date -R)" >> "$LOGDIR/typescript"
 # Record session
 export TERMREC=1
 script -q -a -f --timing="$LOGDIR/timing" "$LOGDIR/typescript"
-"$BASEDIR/chattr_helper" "$LOGDIR/timing"
 
+"$BASEDIR/chattr_helper" immutable "$LOGDIR/"{env,typescript,timing,}
 logger -p auth.notice "$(basename $0)($$): done~"
 
