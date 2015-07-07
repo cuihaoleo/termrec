@@ -1,9 +1,9 @@
 CC=gcc
 
-chattr_helper: chattr_helper.c
+imouto: imouto.c
 	$(CC) -o $@ $^
 
-setcap: chattr_helper
+setcap: imouto
 	chmod +x $^
 	setcap CAP_LINUX_IMMUTABLE+ep $^
 
