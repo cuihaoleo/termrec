@@ -1,5 +1,7 @@
 #!/bin/bash
 
+[ -n "$TERMREC" ] && exit
+
 set -e
 
 BASEDIR=$(dirname $0)
@@ -17,7 +19,7 @@ done
 LOGDIR="$LOGBASE/$LOGDIRNAME"
 "$BASEDIR/chattr_helper" "$LOGDIR/"{,env,typescript}
 
-logger -p auth.notice --id=$$ "$(basename $0)($$): record session to $LOGDIR"
+logger -p auth.notice "$(basename $0)($$): record session to $LOGDIR"
 
 # Record environment variables
 env >> "$LOGDIR/env" 
@@ -26,8 +28,9 @@ env >> "$LOGDIR/env"
 echo "Session start at $(date -R)" >> "$LOGDIR/typescript"
 
 # Record session
+export TERMREC=1
 script -q -a -f --timing="$LOGDIR/timing" "$LOGDIR/typescript"
 "$BASEDIR/chattr_helper" "$LOGDIR/timing"
 
-logger -p auth.notice --id=$$ "$(basename $0)($$): done~"
+logger -p auth.notice "$(basename $0)($$): done~"
 
