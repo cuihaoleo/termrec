@@ -1,0 +1,33 @@
+#!/bin/bash
+
+set -e
+
+BASEDIR=$(dirname $0)
+LOGBASE="$HOME/.termrec"
+TIMEFMT="%Y%m%d-%H:%M:%S%:z"
+
+mkdir -p $LOGBASE
+
+LOGDIRNAME=$(date +"$TIMEFMT")
+while ! mkdir "$LOGBASE/$LOGDIRNAME" ; do
+    sleep 1
+    LOGDIRNAME=$(date +"$TIMEFMT")
+done
+
+LOGDIR="$LOGBASE/$LOGDIRNAME"
+"$BASEDIR/chattr_helper" "$LOGDIR/"{,env,typescript}
+
+logger -p auth.notice --id=$$ "$(basename $0)($$): record session to $LOGDIR"
+
+# Record environment variables
+env >> "$LOGDIR/env" 
+
+# a workaround: https://bugzilla.kernel.org/show_bug.cgi?id=101111
+echo "Session start at $(date -R)" >> "$LOGDIR/typescript"
+
+# Record session
+script -q -a -f --timing="$LOGDIR/timing" "$LOGDIR/typescript"
+"$BASEDIR/chattr_helper" "$LOGDIR/timing"
+
+logger -p auth.notice --id=$$ "$(basename $0)($$): done~"
+
